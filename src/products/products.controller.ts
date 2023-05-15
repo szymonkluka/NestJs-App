@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Delete, Body, Post, Put } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { Product } from 'src/db';
-import { ParseUUIDPipe, NotFoundException, HttpStatus, HttpException, } from '@nestjs/common'; // add ErrorHttpStatusCode to the import statement
+import { ParseUUIDPipe, NotFoundException } from '@nestjs/common'; // add ErrorHttpStatusCode to the import statement
 import { CreateProductDTO } from './dtos/create-product.dto';
 import { UpdateProductDTO } from './dtos/update-product.dto';
 import * as uuid from 'uuid';
@@ -15,10 +15,9 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
 
   @Get('/')
-  getAll(): any {
+  getAll(): Product[] {
     return this.productsService.getAll();
   }
-
 
   @Get('/:id')
   async getById(@Param('id', new ParseUUIDPipe()) id: string) {
