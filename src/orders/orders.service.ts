@@ -1,41 +1,43 @@
-import { Injectable, Body } from '@nestjs/common';
-import { db, Order } from './../db';
-import { v4 as uuidv4 } from 'uuid';
-import { CreateOrderDTO } from './dtos/create-order.dto';
-
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/shared/services/prisma.service';
+import { Order } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
-  public getAll(): Order[] {
-    return db.orders
+  constructor(private prismaService: PrismaService) { }
+
+  public getAll(): Promise<Order[]> {
+    return this.prismaService.order.findMany()
   }
-  public getById(id: number | string): Order | null {
-    return db.orders.find((o) => o.id === id) || null;
+
+  public getById(id: Order['id']): Promise<Order | null> {
+    return this.prismaService.order.findUnique({
+      where: { id },
+    });
   }
-  public deleteById(id: number | string): Order[] | null {
-    const index = db.orders.findIndex((o) => o.id === id);
-    if (index !== -1) {
-      const deletedObject = db.orders.splice(index, 1)[0];
-      return [deletedObject];
-    }
+
+  public deleteById(id: Order['id']): Promise<Order> {
+    return this.prismaService.order.delete({
+      where: { id },
+    });
   }
-  public create(orderData: CreateOrderDTO): Order {
-    const { productId, client, address } = orderData;
-    const order: Order = {
-      id: uuidv4(),
-      productId,
-      client,
-      address,
-    };
-    db.orders.push(order);
-    return order;
+
+  public create(
+    orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Order> {
+    return this.prismaService.order.create({
+      data: orderData,
+    });
   }
-  public updateById(id: Order['id'], orderData: Omit<Order, 'id'>): void {
-    db.orders = db.orders.map((p) => {
-      if (p.id === id) {
-        return { ...p, ...orderData };
-      }
-      return p;
+
+
+  public updateById(
+    id: Order['id'],
+    orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>,
+  ): Promise<Order> {
+    return this.prismaService.order.update({
+      where: { id },
+      data: orderData,
     });
   }
 }

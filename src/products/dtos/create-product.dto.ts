@@ -28,4 +28,7 @@ export class CreateProductDTO {
     return '';
   })
   description: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
