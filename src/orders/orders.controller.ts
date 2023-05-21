@@ -2,6 +2,7 @@ import { Controller, Get, Param, Delete, Post, Body, ParseUUIDPipe, NotFoundExce
 import { OrdersService } from './orders.service';
 import { CreateOrderDTO } from './dtos/create-order.dto';
 import { UpdateOrderDTO } from './dtos/update-order.dto';
+
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) { }
@@ -13,15 +14,15 @@ export class OrdersController {
 
   @Get('/:id')
   async getById(@Param('id', new ParseUUIDPipe()) id: string) {
-    const prod = await this.ordersService.getById(id);
-    if (!prod) throw new NotFoundException('Product not found');
-    return prod;
+    const order = await this.ordersService.getById(id);
+    if (!order) throw new NotFoundException('Order not found');
+    return order;
   }
 
   @Delete('/:id')
   async deleteById(@Param('id', new ParseUUIDPipe()) id: string) {
     if (!(await this.ordersService.getById(id)))
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Order not found');
     await this.ordersService.deleteById(id);
     return { success: true };
   }
@@ -34,13 +35,12 @@ export class OrdersController {
   @Put('/:id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() productData: UpdateOrderDTO,
+    @Body() orderData: UpdateOrderDTO,
   ) {
     if (!(await this.ordersService.getById(id)))
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Order not found');
 
-    await this.ordersService.updateById(id, productData);
+    await this.ordersService.updateById(id, orderData);
     return { success: true };
   }
-
 }
