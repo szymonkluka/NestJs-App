@@ -10,8 +10,4 @@ export class UpdateOrderDTO {
   @IsString()
   @Length(8)
   clientId: string;
-
-  @IsNotEmpty()
-  @IsString()
-  address: string;
 }

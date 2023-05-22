@@ -25,11 +25,10 @@ export class OrdersService {
   }
 
   public async create(orderData: CreateOrderDTO): Promise<Order> {
-    const { productId, clientId, address } = orderData;
+    const { productId, clientId } = orderData;
     try {
       const createdOrder = await this.prismaService.order.create({
         data: {
-          address,
           product: { connect: { id: productId } },
           client: { connect: { id: clientId } },
         } as any,
@@ -49,11 +48,11 @@ export class OrdersService {
     id: Order['id'],
     orderData: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>,
   ): Promise<Order> {
-    const { productId, ...otherData } = orderData;
+    const { productId, clientId, ...otherData } = orderData;
     const data: Prisma.OrderUpdateInput = {
       ...otherData,
       product: { connect: { id: productId } },
-      client: { connect: { id: otherData.clientId } }, // Include the client field with the correct property name
+      client: { connect: { id: clientId } },
     };
 
     return this.prismaService.order.update({
